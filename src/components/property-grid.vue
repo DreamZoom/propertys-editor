@@ -1,9 +1,7 @@
 <template>
   <a-tree class="property-gird" :tree-data="data" blockNode :selectable="false">
-    <template slot="title" slot-scope="{ title,type,format,model,onAdd,onDelete }">
-      <span v-if="type=='object'">
-        {{title}}
-      </span>
+    <template slot="title" slot-scope="{ title,type,format,model,schema,onAdd,onDelete }">
+      <span v-if="type=='object'">{{title}}</span>
       <span v-else-if="type=='array'">
         {{title}}
         <span class="action" title="添加" @click="onAdd">
@@ -11,11 +9,15 @@
         </span>
       </span>
       <span v-else>
-        {{title}} :
-        <component :is="getEditor({type,format})" v-model="model.value" />
+        <a-row type="flex">
+          <a-col>{{title}}:</a-col>
+          <a-col :flex="1">
+            <component :is="getEditor({type,format})" :schema="schema" v-model="model.value" @input="handleChange" />
+          </a-col>
+        </a-row>
       </span>
       <span class="action" title="删除" @click="onDelete" v-if="onDelete">
-        <a-icon type="close"  />
+        <a-icon type="close" />
       </span>
     </template>
   </a-tree>
@@ -24,43 +26,6 @@
 
 <script>
 import editor from "./editor";
-const schema = {
-  type: "object",
-  title: "条件",
-  properties: {
-    name: {
-      type: "string",
-      title: "名称",
-    },
-    appId: {
-      type: "color",
-      title: "应用ID",
-    },
-    credate: {
-      type: "string",
-      title: "创建日期",
-      format: "date",
-    },
-    list: {
-      type: "array",
-      title: "列表",
-      items: {
-        type: "object",
-        title: "用户",
-        properties: {
-          name: {
-            type: "string",
-            title: "名称",
-          },
-          age: {
-            type: "number",
-            title: "年龄",
-          },
-        },
-      },
-    },
-  },
-};
 
 function make_tree(schema, name) {
   const { title, type, format } = schema;
@@ -71,6 +36,7 @@ function make_tree(schema, name) {
     format,
     scopedSlots: { title: "title" },
     model: { value: "" },
+    schema: schema,
   };
   if (type == "object") {
     const children = [];
@@ -118,6 +84,10 @@ function make_json(tree) {
 
 export default {
   name: "PropertyGrid",
+  props: {
+    schema: Object,
+    value: null,
+  },
   data() {
     return {
       data: [],
@@ -129,7 +99,7 @@ export default {
     },
   },
   mounted() {
-    this.data = [make_tree(schema, "root")];
+    this.data = [make_tree(this.schema || {}, "root")];
     console.log(this.data);
   },
   methods: {
@@ -137,6 +107,9 @@ export default {
       const { type, format } = schema;
       return editor.factory(format, type);
     },
+    handleChange(){
+      this.$emit("input",this.json);
+    }
   },
 };
 </script>

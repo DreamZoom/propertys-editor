@@ -1,7 +1,9 @@
+import "./editor.css"
 import string from "./editors/string";
 import number from "./editors/number";
 import date from "./editors/date";
 import color from "./editors/color";
+import select from "./editors/select";
 
 
 const editors = {
@@ -9,7 +11,8 @@ const editors = {
     number,
     integer:number,
     date,
-    color
+    color,
+    select
 }
 
 export default {

@@ -1,8 +1,10 @@
 <template>
-    <a-input-number class="input" :value="value" @change="handleChange" size="small" />
+    <a-input-number class="editor input" :value="value" @change="handleChange" size="small" />
 </template>
 <script>
+import base from "./base";
 export default {
+    extends:base,
     props:{
         value:null
     },
@@ -13,12 +15,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-.input {
-    width: auto;
-    border:none;
-    height: 20px;
-    border-radius: 0px;
-    background-color: #FFFFAB;
-}
-</style>
